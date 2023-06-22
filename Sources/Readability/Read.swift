@@ -80,13 +80,11 @@ public class Readability {
 
     private var success = false // indicates whether we were able to extract or not
 
-    /**
-     * Create instance of Readability
-     * @param string UTF-8 encoded string
-     * @param string (optional) URL associated with HTML (used for footnotes)
-     * @param string which parser to use for turning raw HTML into a DOMDocument (either "libxml" or "html5lib")
-     */
-    public init(html: String, url: String? = nil) {
+    /// Create instance of Readability.
+    /// - Parameters:
+    ///   - html: The HTML to parse.
+    ///   - url: URL associated with HTML (used for footnotes).
+    public init(html: String, url: String? = nil) throws {
         self.url = url
 
         // when converting code blocks containing highlight spans, whitespace surrounded by span tags can get stripped
@@ -101,10 +99,10 @@ public class Readability {
             self.html = "<html></html>"
         }
 
-        if url != nil {
-            dom = try! SwiftSoup.parse(self.html, url!)
+        if let url {
+            dom = try SwiftSoup.parse(self.html, url)
         } else {
-            dom = try! SwiftSoup.parse(self.html)
+            dom = try SwiftSoup.parse(self.html)
         }
         cleanRougeTables()
     }
