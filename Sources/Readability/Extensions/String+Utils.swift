@@ -1,5 +1,5 @@
 //
-//  StringHelpers.swift
+//  String+Utils.swift
 //  Prev
 //
 //  Created by Shahaf Levi on 27/11/2015.
@@ -10,7 +10,7 @@ import Foundation
 
 extension String {
     var nsLength: Int {
-        return (self as NSString).length
+        (self as NSString).length
     }
 
     /// Converts a Range<String.Index> to an NSRange.
@@ -75,7 +75,8 @@ extension String {
         var characterSet = CharacterSet.alphanumerics
         characterSet.insert(charactersIn: "-._* ")
 
-        return addingPercentEncoding(withAllowedCharacters: characterSet)?.replacingOccurrences(of: " ", with: "+")
+        return addingPercentEncoding(withAllowedCharacters: characterSet)?
+            .replacingOccurrences(of: " ", with: "+")
     }
 
     func chopPrefix(_ prefix: String) -> String? {
@@ -99,8 +100,8 @@ extension String {
         let selfR = String(reversed())
         let result = selfR.chopPrefix(suffixR)
 
-        if result != nil {
-            return String(result!.reversed())
+        if let result {
+            return String(result.reversed())
         } else {
             return nil
         }
@@ -116,15 +117,15 @@ extension String {
     }
 
     func shellescape() -> String {
-        return replacingOccurrences(of: "[\"\"]", with: "\\$1", options: .regularExpression)
+        replacingOccurrences(of: "[\"\"]", with: "\\$1", options: .regularExpression)
     }
 
     func substring(startingAt: Int) -> String {
-        return String(self[index(startIndex, offsetBy: startingAt)...])
+        String(self[index(startIndex, offsetBy: startingAt)...])
     }
 
     func substring(endingAt: Int) -> String {
-        return String(self[..<index(startIndex, offsetBy: endingAt)])
+        String(self[..<index(startIndex, offsetBy: endingAt)])
     }
 
     func substring(at range: NSRange) -> String? {
@@ -136,7 +137,7 @@ extension String {
     }
 
     func matches(_ pattern: String) -> Bool {
-        return range(of: pattern, options: .regularExpression) != nil
+        range(of: pattern, options: .regularExpression) != nil
     }
 
     func captureGroups(of pattern: NSRegularExpression) -> [[String]] {
@@ -156,24 +157,8 @@ extension String {
     }
 }
 
-extension NSString {
-    func paragraphRange(at location: Int) -> NSRange {
-        return paragraphRange(for: NSRange(location: location, length: 0))
-    }
-
-    func lineRange(at location: Int) -> NSRange {
-        return lineRange(for: NSRange(location: location, length: 0))
-    }
-
-    func rangesOfString(s: String) -> [NSRange] {
-        let re = try! NSRegularExpression(pattern: NSRegularExpression.escapedPattern(for: s), options: [])
-        let checkRange = NSMakeRange(0, length)
-        return re.matches(in: self as String, options: [], range: checkRange).compactMap { $0.range }
-    }
-}
-
 func roundToClosest(_ number: Double, to: Double) -> Int {
-    return Int(to * round(number / to))
+    Int(to * round(number / to))
 }
 
 /* extension NSRange {
