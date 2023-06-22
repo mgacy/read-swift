@@ -119,7 +119,7 @@ public class Readability {
             throw ReadabilityError.custom("No document associated with dom.")
         }
 
-        removeScripts(dom)
+        try removeScripts(dom)
 
         let bodyElems = try dom.getElementsByTag("body").array()
 
@@ -131,7 +131,7 @@ public class Readability {
             if body == nil {
                 let bodyHTML = try bodyElems[0].html()
 
-                try! body?.html(bodyHTML)
+                try body?.html(bodyHTML)
             }
         }
 
@@ -192,12 +192,12 @@ public class Readability {
                 try articleContent.append("<h3>All Answers</h3>")
                 for answer in otherAnswers {
                     let upvotesEl = try answer.select(".js-vote-count").first()
-                    let upvotes = upvotesEl != nil ? Int(try! upvotesEl!.attr("data-value"))! : 0
+                    let upvotes = upvotesEl != nil ? Int(try upvotesEl!.attr("data-value"))! : 0
                     if minimumAnswerUpvotes == 0 || upvotes >= minimumAnswerUpvotes {
-                        try articleContent.append(try! answer.select(".js-post-body").html())
+                        try articleContent.append(try answer.select(".js-post-body").html())
                         if includeAnswerComments {
                             try articleContent.append("<h4>Comments</h4>")
-                            try articleContent.append(try! answer.select(".comments .comments-list .comment .comment-text").html())
+                            try articleContent.append(try answer.select(".comments .comments-list .comment .comment-text").html())
                         }
                         try articleContent.append("<hr>")
                     }
@@ -235,7 +235,7 @@ public class Readability {
             throw ReadabilityError.custom("No document associated with dom.")
         }
 
-        removeScripts(dom)
+        try removeScripts(dom)
 
         let bodyElems = try dom.getElementsByTag("body").array()
 
@@ -267,7 +267,7 @@ public class Readability {
         let title = try question.select(".header h1.title").first()!.getInnerText()
 
         let articleTitleh1 = try dom.createElement("h1")
-        try! articleTitleh1.text(title)
+        try articleTitleh1.text(title)
 
         let questionContent = try question.select("section.question .content .column-right .post-content").array()[0]
 
@@ -285,7 +285,7 @@ public class Readability {
             }
         }
 
-        if try! articleContent.getInnerText() == "" {
+        if try articleContent.getInnerText() == "" {
             throw ReadabilityError.parsingFailed
         }
 
@@ -383,18 +383,18 @@ public class Readability {
             }
         }
 
-        removeScripts(dom)
+        try removeScripts(dom)
 
         let bodyElems = try dom.getElementsByTag("body").array()
         if bodyElems.count > 0 {
             if bodyCache == nil {
-                bodyCache = try! bodyElems[0].html()
+                bodyCache = try bodyElems[0].html()
             }
 
             if body == nil {
-                let bodyHTML = try! bodyElems[0].html()
+                let bodyHTML = try bodyElems[0].html()
 
-                try! body?.html(bodyHTML)
+                try body?.html(bodyHTML)
             }
         }
 
@@ -529,7 +529,7 @@ public class Readability {
                 }
                 curTitle = origTitle.trimmingCharacters(in: .whitespacesAndNewlines)
                 articleTitle = try dom.createElement("h1")
-                try! articleTitle?.html(curTitle)
+                try articleTitle?.html(curTitle)
 
                 return articleTitle
             } else {
@@ -557,9 +557,9 @@ public class Readability {
         try body?.attr("id", "readabilityBody")
 
         /* Remove all style tags in head */
-        let styleTags = try! dom.getElementsByTag("style").array()
+        let styleTags = try dom.getElementsByTag("style").array()
         for tag in styleTags {
-            try! tag.parent()?.removeChild(tag)
+            try tag.parent()?.removeChild(tag)
         }
 
         // Remove aria-hidden elements
@@ -586,7 +586,7 @@ public class Readability {
         try footnotesWrapper.attr("id", "readability-footnotes")
         try footnotesWrapper.html("<h3>References</h3>")
 
-        let articleFootnotes = try! dom.createElement("ol")
+        let articleFootnotes = try dom.createElement("ol")
         try articleFootnotes.attr("id", "readability-footnotes-list")
         try footnotesWrapper.appendChild(articleFootnotes)
 
@@ -662,14 +662,14 @@ public class Readability {
      */
     public func prepArticle(_ articleContent: Element) throws {
         try articleContent.cleanStyles()
-        killBreaks(articleContent)
+        try killBreaks(articleContent)
 
         if revertForcedParagraphElements {
             try articleContent.revertReadabilityStyledElements()
         }
 
         /* Clean out junk from the article content */
-        cleanConditionally(articleContent, tag: "form")
+        try cleanConditionally(articleContent, tag: "form")
         try articleContent.clean(tag: "object")
         try articleContent.clean(tag: "h1")
 
@@ -686,9 +686,9 @@ public class Readability {
         try articleContent.cleanHeaders(getClassWeight: flagIsActive(flag: FLAG_WEIGHT_CLASSES))
 
         /* Do these last as the previous stuff may have removed junk that will affect these */
-        cleanConditionally(articleContent, tag: "table")
-        cleanConditionally(articleContent, tag: "ul")
-        cleanConditionally(articleContent, tag: "div")
+        try cleanConditionally(articleContent, tag: "table")
+        try cleanConditionally(articleContent, tag: "ul")
+        try cleanConditionally(articleContent, tag: "div")
 
         /* Remove extra paragraphs */
         let articleParagraphs = try articleContent.getElementsByTag("p").array()
@@ -767,7 +767,7 @@ public class Readability {
             page = dom
         }
 
-        let allElements = try! page?.getAllElements().array()
+        let allElements = try page?.getAllElements().array()
 
         /**
          * First, node prepping. Trash nodes that look cruddy (like ones with the class name "comment", etc), and turn divs
@@ -786,12 +786,12 @@ public class Readability {
 
             /* Remove unlikely candidates */
             if stripUnlikelyCandidates {
-                let unlikelyMatchString = try! node.attr("class") + node.attr("id")
+                let unlikelyMatchString = try node.attr("class") + node.attr("id")
 
                 if unlikelyMatchString.matches(RegEx.unlikelyCandidates) && !unlikelyMatchString.matches(RegEx.okMaybeItsACandidate) && tagName != "BODY" {
                     dbg(msg: "Removing unlikely candidate - \(unlikelyMatchString)")
 
-                    try! node.parent()?.removeChild(node)
+                    try node.parent()?.removeChild(node)
 
                     continue
                 }
@@ -803,8 +803,8 @@ public class Readability {
 
             /* Turn all divs that don"t have children block level elements into p"s */
             if tagName == "DIV" {
-                if !((try! node.html()).matches(RegEx.divToPElements)) {
-                    let newNode = try! dom.createElement("p")
+                if !((try node.html()).matches(RegEx.divToPElements)) {
+                    let newNode = try dom.createElement("p")
 
                     do {
                         try newNode.html(node.html())
@@ -819,11 +819,11 @@ public class Readability {
                     for childNode in node.getChildNodes() {
                         if Int(childNode.nodeName()) == 3 { // XML_TEXT_NODE
                             // self.dbg("replacing text node with a p tag with the same content.");
-                            let p = try! dom.createElement("p")
-                            try! p.html(childNode.nodeName())
-                            try! p.attr("style", "display: inline;")
-                            try! p.attr("class", "readability-styled")
-                            try! childNode.parent()?.replaceChild(p, childNode)
+                            let p = try dom.createElement("p")
+                            try p.html(childNode.nodeName())
+                            try p.attr("style", "display: inline;")
+                            try p.attr("class", "readability-styled")
+                            try childNode.parent()?.replaceChild(p, childNode)
                         }
                     }
                 }
@@ -842,7 +842,7 @@ public class Readability {
             let parentNode = pt.parent()
             // $grandParentNode = $parentNode ? $parentNode->parentNode : null;
             let grandParentNode = parentNode == nil ? nil : parentNode!.parent()
-            let innerText = try! pt.getInnerText()
+            let innerText = try pt.getInnerText()
 
             if parentNode == nil || parentNode!.tagName().isEmpty {
                 continue
@@ -880,19 +880,19 @@ public class Readability {
             var parentCurrentScore = Int(0)
             var grandParentCurrentScore = Int(0)
             if parentNode != nil {
-                parentCurrentScore = Int(try! parentNode!.attr("readability"))!
+                parentCurrentScore = Int(try parentNode!.attr("readability"))!
             }
             if grandParentNode != nil {
-                grandParentCurrentScore = Int(try! grandParentNode!.attr("readability"))!
+                grandParentCurrentScore = Int(try grandParentNode!.attr("readability"))!
             }
 
             parentCurrentScore += contentScore
 
-            try! parentNode!.attr("readability", String(parentCurrentScore))
+            try parentNode!.attr("readability", String(parentCurrentScore))
 
             if grandParentNode != nil {
                 grandParentCurrentScore += contentScore / 2
-                try! grandParentNode!.attr("readability", String(grandParentCurrentScore))
+                try grandParentNode!.attr("readability", String(grandParentCurrentScore))
             }
         }
 
@@ -907,15 +907,15 @@ public class Readability {
              * Scale the final candidates score based on link density. Good content should have a
              * relatively small link density (5% or less) and be mostly unaffected by this operation.
              **/
-            let readability = try! cl.attr("readability")
+            let readability = try cl.attr("readability")
 
-            let value = Float(readability)! * (1 - (try! cl.getLinkDensity()))
+            let value = Float(readability)! * (1 - (try cl.getLinkDensity()))
 
-            try! cl.attr("readability", String(value))
+            try cl.attr("readability", String(value))
 
-            dbg(msg: "Candidate: \(cl.tagName()) (\(try! cl.attr("class")): \(try! cl.attr("id"))) with score \(readability)")
+            dbg(msg: "Candidate: \(cl.tagName()) (\(try cl.attr("class")): \(try cl.attr("id"))) with score \(readability)")
 
-            let topCandidateScore = try! topCandidate?.attr("readability")
+            let topCandidateScore = try topCandidate?.attr("readability")
 
             if topCandidate == nil || Int(readability)! > Int(Float(topCandidateScore!)!) {
                 topCandidate = cl
@@ -927,20 +927,20 @@ public class Readability {
          * We also have to copy the body node so it is something we can modify.
          **/
         if topCandidate === nil || topCandidate?.tagName().uppercased() == "BODY" {
-            topCandidate = try! dom.createElement("div")
+            topCandidate = try dom.createElement("div")
 
             if page! is Document {
                 if page?.ownerDocument() == nil {
                     // we don't have a body either? what a mess! :)
                 } else {
-                    try! topCandidate?.html((page?.ownerDocument()?.html())!)
-                    try! page?.ownerDocument()?.html("")
-                    try! page?.ownerDocument()?.appendChild(topCandidate!)
+                    try topCandidate?.html((page?.ownerDocument()?.html())!)
+                    try page?.ownerDocument()?.html("")
+                    try page?.ownerDocument()?.appendChild(topCandidate!)
                 }
             } else {
-                try! topCandidate?.html((page?.html())!)
-                try! page?.html("")
-                try! page?.appendChild(topCandidate!)
+                try topCandidate?.html((page?.html())!)
+                try page?.html("")
+                try page?.appendChild(topCandidate!)
             }
 
             try initializeNode(topCandidate!)
@@ -950,10 +950,10 @@ public class Readability {
          * Now that we have the top candidate, look through its siblings for content that might also be related.
          * Things like preambles, content split by ads that we removed, etc.
          **/
-        let articleContent = try! dom.createElement("div")
-        try! articleContent.attr("id", "readability-content")
+        let articleContent = try dom.createElement("div")
+        try articleContent.attr("id", "readability-content")
 
-        let siblingScoreThreshold = max(10, Double(try! topCandidate!.attr("readability"))! * 0.2)
+        let siblingScoreThreshold = max(10, Double(try topCandidate!.attr("readability"))! * 0.2)
         var siblingNodes: [Node]? = topCandidate?.parent()?.getChildNodes()
 
         if siblingNodes == nil {
@@ -963,7 +963,7 @@ public class Readability {
         for siblingNode in siblingNodes! {
             var append = false
 
-            try! dbg(msg: "Looking at sibling node: \(siblingNode.nodeName()) \((siblingNode.hasAttr("readability")) ? (" with score " + siblingNode.attr("readability")) : ""))")
+            try dbg(msg: "Looking at sibling node: \(siblingNode.nodeName()) \((siblingNode.hasAttr("readability")) ? (" with score " + siblingNode.attr("readability")) : ""))")
 
             // dbg("Sibling has score " . ($siblingNode->readability ? siblingNode.readability.contentScore : "Unknown"));
 
@@ -974,17 +974,17 @@ public class Readability {
 
             var contentBonus: Double = 0
             /* Give a bonus if sibling nodes and top candidates have the example same classname */
-            if try! siblingNode.attr("class") == topCandidate!.attr("class") && topCandidate!.attr("class") != "" {
-                contentBonus += Double(try! topCandidate!.attr("readability"))! * 0.2
+            if try siblingNode.attr("class") == topCandidate!.attr("class") && topCandidate!.attr("class") != "" {
+                contentBonus += Double(try topCandidate!.attr("readability"))! * 0.2
             }
 
-            if try! siblingNode.hasAttr("readability") && (Double(siblingNode.attr("readability"))! + contentBonus) >= siblingScoreThreshold {
+            if try siblingNode.hasAttr("readability") && (Double(siblingNode.attr("readability"))! + contentBonus) >= siblingScoreThreshold {
                 append = true
             }
 
             if siblingNode.nodeName().uppercased() == "P" {
-                let linkDensity = try! (siblingNode as! Element).getLinkDensity()
-                let nodeContent = try! (siblingNode as! Element).getInnerText()
+                let linkDensity = try (siblingNode as! Element).getLinkDensity()
+                let nodeContent = try (siblingNode as! Element).getInnerText()
                 let nodeLength = nodeContent.count
 
                 if nodeLength > 80 && linkDensity < 0.25 {
@@ -1005,7 +1005,7 @@ public class Readability {
 
                     dbg(msg: "Altering siblingNode of \(sibNodeName) to div.")
 
-                    nodeToAppend = try! dom.createElement("div")
+                    nodeToAppend = try dom.createElement("div")
 
                     do {
                         try nodeToAppend?.attr("id", siblingNode.attr("id"))
@@ -1020,10 +1020,10 @@ public class Readability {
                 }
 
                 /* To ensure a node does not interfere with readability styles, remove its classnames */
-                try! nodeToAppend?.removeAttr("class")
+                try nodeToAppend?.removeAttr("class")
 
                 /* Append sibling and subtract from our list because it removes the node when you append to another node */
-                try! articleContent.appendChild(nodeToAppend!)
+                try articleContent.appendChild(nodeToAppend!)
             }
         }
 
@@ -1038,14 +1038,14 @@ public class Readability {
          * likelihood of finding the content, and the sieve approach gives us a higher likelihood of
          * finding the -right- content.
          **/
-        if try! articleContent.getInnerText(normalizeSpaces: false).count < 250 {
+        if try articleContent.getInnerText(normalizeSpaces: false).count < 250 {
             // TODO: find out why element disappears sometimes, e.g. for this URL http://www.businessinsider.com/6-hedge-fund-etfs-for-average-investors-2011-7
             // in the meantime, we check and create an empty element if it's not there.
             if body?.getChildNodes() == nil {
-                body = try! dom.createElement("body")
+                body = try dom.createElement("body")
             }
 
-            try! body?.html(bodyCache!)
+            try body?.html(bodyCache!)
 
             if flagIsActive(flag: FLAG_STRIP_UNLIKELYS) {
                 removeFlag(flag: FLAG_STRIP_UNLIKELYS)
@@ -1071,17 +1071,17 @@ public class Readability {
      * @param DOMElement
      * @return void
      */
-    public func removeScripts(_ doc: Document) {
-        let scripts = try! doc.getElementsByTag("script").array()
+    public func removeScripts(_ doc: Document) throws {
+        let scripts = try doc.getElementsByTag("script").array()
 
         for script in scripts {
-            try! script.parent()?.removeChild(script)
+            try script.parent()?.removeChild(script)
         }
 
-        let noscripts = try! doc.getElementsByTag("noscript").array()
+        let noscripts = try doc.getElementsByTag("noscript").array()
 
         for script in noscripts {
-            try! script.parent()?.removeChild(script)
+            try script.parent()?.removeChild(script)
         }
     }
 
@@ -1091,12 +1091,12 @@ public class Readability {
      * @param DOMElement $node
      * @return void
      */
-    public func killBreaks(_ node: Element) {
-        html = try! node.html()
+    public func killBreaks(_ node: Element) throws {
+        html = try node.html()
 
         html = html.replacingOccurrences(of: RegEx.killBreaks, with: "<br />")
 
-        try! node.html(html)
+        try node.html(html)
     }
 
     /**
@@ -1108,12 +1108,12 @@ public class Readability {
      * @param string $tag
      * @return void
      */
-    public func cleanConditionally(_ e: Element, tag: String) {
+    public func cleanConditionally(_ e: Element, tag: String) throws {
         if !flagIsActive(flag: FLAG_CLEAN_CONDITIONALLY) {
             return
         }
 
-        let tagsList = try! e.getElementsByTag(tag).array()
+        let tagsList = try e.getElementsByTag(tag).array()
 
         /**
          * Gather counts for other typical elements embedded within.
@@ -1122,44 +1122,44 @@ public class Readability {
          * TODO: Consider taking into account original contentScore here.
          */
         for tag in tagsList {
-            let weight = flagIsActive(flag: FLAG_WEIGHT_CLASSES) ? try! tag.getClassWeight() : 0
+            let weight = flagIsActive(flag: FLAG_WEIGHT_CLASSES) ? try tag.getClassWeight() : 0
 
-            let contentScore = (tag.hasAttr("readability")) ? try! Int(Float(tag.attr("readability"))!) : 0
+            let contentScore = (tag.hasAttr("readability")) ? try Int(Float(tag.attr("readability"))!) : 0
 
-            dbg(msg: "Cleaning Conditionally \(tag.tagName()) (\(try! tag.attr("class"))/#\(try! tag.attr("id")))" + "\(tag.hasAttr("readability") ? " with score  \(try! tag.attr("readability"))" : "")")
+            dbg(msg: "Cleaning Conditionally \(tag.tagName()) (\(try tag.attr("class"))/#\(try tag.attr("id")))" + "\(tag.hasAttr("readability") ? " with score  \(try tag.attr("readability"))" : "")")
 
             if weight + contentScore < 0 {
-                try! tag.parent()?.removeChild(tag)
-            } else if try! tag.getCharCount(s: ",") < 10 {
+                try tag.parent()?.removeChild(tag)
+            } else if try tag.getCharCount(s: ",") < 10 {
                 /**
                  * If there are not very many commas, and the number of
                  * non-paragraph elements is more than paragraphs or other ominous signs, remove the element.
                  **/
-                let p = try! tag.getElementsByTag("p").array().count
-                let img = try! tag.getElementsByTag("img").array().count
-                let li = try! tag.getElementsByTag("li").array().count - 100
-                let input = try! tag.getElementsByTag("input").array().count
-                let a = try! tag.getElementsByTag("a").array().count
+                let p = try tag.getElementsByTag("p").array().count
+                let img = try tag.getElementsByTag("img").array().count
+                let li = try tag.getElementsByTag("li").array().count - 100
+                let input = try tag.getElementsByTag("input").array().count
+                let a = try tag.getElementsByTag("a").array().count
 
                 var embedCount = 0
-                var embeds = try! tag.getElementsByTag("embed").array()
+                var embeds = try tag.getElementsByTag("embed").array()
 
                 for embed in embeds {
-                    if try! embed.attr("src").matches(RegEx.video) {
+                    if try embed.attr("src").matches(RegEx.video) {
                         embedCount += 1
                     }
                 }
 
-                embeds = try! tag.getElementsByTag("iframe").array()
+                embeds = try tag.getElementsByTag("iframe").array()
 
                 for iframe in embeds {
-                    if try! iframe.attr("src").matches(RegEx.video) {
+                    if try iframe.attr("src").matches(RegEx.video) {
                         embedCount += 1
                     }
                 }
 
-                let linkDensity = try! tag.getLinkDensity()
-                let contentLength = try! tag.getInnerText().count
+                let linkDensity = try tag.getLinkDensity()
+                let contentLength = try tag.getInnerText().count
                 var toRemove = false
 
                 if lightClean {
@@ -1229,7 +1229,7 @@ public class Readability {
                 }
 
                 if toRemove {
-                    try! tag.parent()?.removeChild(tag)
+                    try tag.parent()?.removeChild(tag)
                 }
             }
         }
